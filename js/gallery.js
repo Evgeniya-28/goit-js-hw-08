@@ -1,4 +1,3 @@
-// створення галереї зображень
 const images = [
   {
     preview:
@@ -64,63 +63,35 @@ const images = [
     description: "Lighthouse Coast Sea",
   },
 ];
+let gallery = document.querySelector(".gallery");
 
-const listElem = document.querySelector(".gallery");
-let instance;
+const newContent = images
+  .map(
+    (image) => `
+    <li class="gallery-item">
+      <a class="gallery-link" href="${image.original}">
+        <img
+          class="gallery-image"
+          src="${image.preview}"
+          data-source="${image.original}"
+          alt="${image.description}"
+        />
+      </a>
+    </li>`
+  )
+  .join("");
 
-function getListElemMrkup(image) {
-  return `<li class="gallery-item">
-  <a class="gallery-link" href=${image.original}>
-    <img
-      class="gallery-image"
-      src=${image.preview}
-      data-source=${image.original}
-      alt=${image.description}
-    />
-  </a>
-  </li>`;
-}
+gallery.insertAdjacentHTML("beforeend", newContent);
 
-function getListMrkup(images) {
-  return images.map(getListElemMrkup).join("\n");
-}
-
-const listImagesMrkup = getListMrkup(images);
-
-listElem.insertAdjacentHTML("afterbegin", listImagesMrkup);
-
-// Прослуховувач подій
-listElem.addEventListener("click", (ev) => {
-  ev.preventDefault();
-  const isImageClick = ev.target.nodeName === "IMG";
-  // console.log(isImageClick);
-  if (isImageClick) {
-    openModal(ev.target.dataset.source);
-  }
-});
-
-function openModal(imageSrc) {
-  instance = basicLightbox.create(
-    `
-    <img src=${imageSrc} width="800" height="600">
-`,
-    {
-      onShow: (instance) =>
-        window.addEventListener("keydown", handleCloseModal),
-      onClose: (instance) =>
-        window.removeEventListener("keydown", handleCloseModal),
-    }
-  );
-
-  instance.show();
-}
-
-function closeModal() {
-  instance.close();
-}
-
-function handleCloseModal(ev) {
-  if (ev.code === "Escape") {
-    closeModal();
+function handleClick(event) {
+  event.preventDefault();
+  if (event.target.nodeName === "IMG") {
+    console.log(event.target.dataset.source);
+    const modal = basicLightbox.create(`
+	<img src=${event.target.dataset.source}>
+`);
+    modal.show();
   }
 }
+
+gallery.addEventListener("click", handleClick);
